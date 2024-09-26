@@ -224,7 +224,7 @@ class MyWindow(QWidget):
 
     def get_jwt(self):
         all_jwt = self.jwt_txt.toPlainText()
-        re_jwt = "[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+"
+        re_jwt = r"[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+"
         if re.search(re_jwt,all_jwt):
             return re.search(re_jwt,all_jwt).group()
         else:
@@ -599,8 +599,8 @@ class MyWindow(QWidget):
     def print_raw(self, raw, type):
         print_str = ""
         if type == "req":
-            url = '/'+re.sub('^http[s]?://.+\.[0-9a-zA-Z]+[:]?[1-6]?[0-9]?[0-9]?[0-9]?[0-9]?[/]','',raw['url'])
-            ret = re.search('^http[s]?://(?P<host>.+\.[0-9a-zA-Z]+[:]?[1-6]?[0-9]?[0-9]?[0-9]?[0-9]?)[/]', raw['url'])
+            url = '/'+re.sub(r'^http[s]?://.+\.[0-9a-zA-Z]+[:]?[1-6]?[0-9]?[0-9]?[0-9]?[0-9]?[/]','',raw['url'])
+            ret = re.search(r'^http[s]?://(?P<host>.+\.[0-9a-zA-Z]+[:]?[1-6]?[0-9]?[0-9]?[0-9]?[0-9]?)[/]', raw['url'])
             host = ret.group('host')
             print_str += raw['method'] + " " + url + " HTTP/1.1\n"
             print_str += "Host: " + host + "\n"
