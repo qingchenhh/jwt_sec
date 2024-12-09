@@ -677,11 +677,14 @@ class MyWindow(QWidget):
             self.key_edit.setText(self.jwt_key)
             print('爆破成功！，key:',self.jwt_key)
             # print('data的类型：',type(data))
+            right_jwt_key = self.jwt_key
+            if self.jwt_key == '':
+                right_jwt_key = self.jwt_key + "(空token)"
             self.sec_result.append(
                 {'test_id': 3, 'test_title': 'jwt爆破测试', 'status_code': '无',
                  'rep_length': '无',
                  'test_result': '爆破成功！',
-                 'description': 'jwt爆破成功。', 'req_data': 'jwt爆破成功，key为：'+self.jwt_key,
+                 'description': 'jwt爆破成功。', 'req_data': 'jwt爆破成功，key为：'+ right_jwt_key,
                  'rep_data': '解码数据为：'+ data, 'sec_flag': False})
             return True
         else:
