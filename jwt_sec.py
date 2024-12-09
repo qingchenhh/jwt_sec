@@ -669,16 +669,20 @@ class MyWindow(QWidget):
             self.jwt_key = tmp_jwt
             try:
                 data = jwt.decode(jwt_str, self.jwt_key, algorithms=[self.alg])
+                if isinstance(data, dict):
+                    print(data)
+                    data = json.dumps(data)
             except Exception as aaa:
                 data = "密钥虽然正确，但是有其他异常值，异常值为：" + str(aaa)
             self.key_edit.setText(self.jwt_key)
             print('爆破成功！，key:',self.jwt_key)
+            # print('data的类型：',type(data))
             self.sec_result.append(
                 {'test_id': 3, 'test_title': 'jwt爆破测试', 'status_code': '无',
                  'rep_length': '无',
                  'test_result': '爆破成功！',
                  'description': 'jwt爆破成功。', 'req_data': 'jwt爆破成功，key为：'+self.jwt_key,
-                 'rep_data': '解码数据为：'+data, 'sec_flag': False})
+                 'rep_data': '解码数据为：'+ data, 'sec_flag': False})
             return True
         else:
             self.sec_result.append(
