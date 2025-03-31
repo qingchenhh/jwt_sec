@@ -144,6 +144,8 @@ class MyWindow(QWidget):
         jwt_str = self.get_jwt()
         if jwt_str:
             jwt_payload_base64 = jwt_str.split('.')[1]
+            print('jwt_payload_base64 is :',jwt_payload_base64)
+            jwt_payload_base64 = jwt_payload_base64.replace('_','/')
             try:
                 jwt_payload = base64.b64decode(jwt_payload_base64).decode('utf-8')
             except Exception as e:
@@ -257,6 +259,7 @@ class MyWindow(QWidget):
             brutes = self.brute(jwt_str)
             # self.get_jwt_payload()
             jwt_payload_base64 = jwt_str.split('.')[1]
+            jwt_payload_base64 = jwt_payload_base64.replace('_','/')
             try:
                 jwt_payload1 = base64.b64decode(jwt_payload_base64).decode('utf-8')
             except Exception as e:
@@ -279,6 +282,7 @@ class MyWindow(QWidget):
                 # 如果爆破不成功，但是存在none空漏洞，也可以替换请求。
                 elif self.sec_result[2]['sec_flag'] == False:
                     jwt_payload = base64.b64encode(json.loads(replace_payload).encode('utf-8')).decode('utf-8').replace('=','')
+                    jwt_payload = jwt_payload.replace('/','_')
                     replace_jwt = base64.b64encode(json.dumps(jwt_header).encode('utf-8')).decode('utf-8') + '.' + jwt_payload + '.'
                 else:
                     return False
@@ -645,8 +649,19 @@ class MyWindow(QWidget):
                 brute_flag = True
                 tmp_jwt = jwt_key
             except Exception as eee:
-                print(eee)
-                QMessageBox.warning(self, '警告', '指定的jwt的key错误！建议删除指定的jwt的key，使用爆破的方式来对jwt进行爆破。')
+                # 解决jjwt认证框架jwt解码bug
+                try:
+                    secret = base64.b64decode(jwt_key[:len(jwt_key) - (len(jwt_key) % 4)])
+                    jwt.decode(jwt_str, secret, algorithms=[self.alg])
+                    brute_flag = True
+                    tmp_jwt = jwt_key
+                except (jwt.ExpiredSignatureError, jwt.InvalidAudienceError, jwt.InvalidIssuedAtError,
+                        jwt.ImmatureSignatureError) as jerror1:
+                    brute_flag = True
+                    tmp_jwt = jwt_key
+                except Exception as eeee:
+                    print(eeee)
+                    QMessageBox.warning(self, '警告', '指定的jwt的key错误！建议删除指定的jwt的key，使用爆破的方式来对jwt进行爆破。')
         elif os.path.exists(jwt_dic_path):
             print('开始爆破')
             with open(jwt_dic_path,mode='r',encoding='utf-8') as keyfile:
