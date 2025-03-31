@@ -676,7 +676,19 @@ class MyWindow(QWidget):
                         tmp_jwt = tmp_key.replace('\n','')
                     except Exception as jwt_decode_error:
                         # print(tmp_key.replace("\n",''),jwt_decode_error)
-                        continue
+                        # 解决jjwt认证框架jwt解码bug
+                        try:
+                            secret = base64.b64decode(jwt_key[:len(jwt_key) - (len(jwt_key) % 4)])
+                            jwt.decode(jwt_str, secret, algorithms=[self.alg])
+                            brute_flag = True
+                            tmp_jwt = jwt_key
+                        except (jwt.ExpiredSignatureError, jwt.InvalidAudienceError, jwt.InvalidIssuedAtError,
+                                jwt.ImmatureSignatureError) as jerror1:
+                            brute_flag = True
+                            tmp_jwt = jwt_key
+                        except Exception as eeee:
+                            print(eeee)
+                            continue
         else:
             QMessageBox.warning(self, '警告', '您指定的字典文件路径不存在，请选择正确的字典路径！')
 
