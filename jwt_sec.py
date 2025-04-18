@@ -1,6 +1,7 @@
 import sys,re,jwt,json,base64,requests,os
 from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QLineEdit, QPushButton, QVBoxLayout, QHBoxLayout, QTextEdit, QComboBox, QTableWidget, QHeaderView, QFileDialog, QAbstractItemView, QMessageBox,QTableWidgetItem
 from PyQt5.QtGui import QIcon,QColor
+from PyQt5.QtGui import QKeySequence
 
 class MyWindow(QWidget):
     def __init__(self):
@@ -146,6 +147,7 @@ class MyWindow(QWidget):
             jwt_payload_base64 = jwt_str.split('.')[1]
             print('jwt_payload_base64 is :',jwt_payload_base64)
             jwt_payload_base64 = jwt_payload_base64.replace('_','/')
+            jwt_payload_base64 = jwt_payload_base64.replace('-', '+')
             try:
                 jwt_payload = base64.b64decode(jwt_payload_base64).decode('utf-8')
             except Exception as e:
@@ -234,6 +236,8 @@ class MyWindow(QWidget):
 
     def jwt_vul(self,jwt_str):
         jwt_header_base64 = jwt_str.split('.')[0]
+        jwt_header_base64 = jwt_header_base64.replace('_', '/')
+        jwt_header_base64 = jwt_header_base64.replace('-', '+')
         try:
             jwt_header = json.loads(base64.b64decode(jwt_header_base64))
         except Exception as e:
@@ -260,6 +264,7 @@ class MyWindow(QWidget):
             # self.get_jwt_payload()
             jwt_payload_base64 = jwt_str.split('.')[1]
             jwt_payload_base64 = jwt_payload_base64.replace('_','/')
+            jwt_payload_base64 = jwt_payload_base64.replace('-', '+')
             try:
                 jwt_payload1 = base64.b64decode(jwt_payload_base64).decode('utf-8')
             except Exception as e:
@@ -271,11 +276,13 @@ class MyWindow(QWidget):
                     jwt_payload1 = base64.b64decode(jwt_payload_base64 + "==").decode('utf-8')
             try:
                 if self.new_str.toPlainText():
+                    print("替换前内容：",jwt_payload1)
+                    print("要替换的内容：", self.new_str.toPlainText())
                     replace_payload = jwt_payload1.replace(self.old_str.toPlainText(),self.new_str.toPlainText())
+                    print("替换后内容：", replace_payload)
                 else:
                     return False
                 if brutes:
-
                     # 生成新的jwt
                     replace_jwt = jwt.encode(json.loads(replace_payload),self.jwt_key,algorithm=self.alg)
 
@@ -283,11 +290,12 @@ class MyWindow(QWidget):
                 elif self.sec_result[2]['sec_flag'] == False:
                     jwt_payload = base64.b64encode(json.loads(replace_payload).encode('utf-8')).decode('utf-8').replace('=','')
                     jwt_payload = jwt_payload.replace('/','_')
+                    jwt_payload = jwt_payload.replace('+', '-')
                     replace_jwt = base64.b64encode(json.dumps(jwt_header).encode('utf-8')).decode('utf-8') + '.' + jwt_payload + '.'
                 else:
                     return False
                 # print(replace_jwt)
-                    # 如果在请求头中，就替换请求头
+                # 如果在请求头中，就替换请求头
                 if self.jwt_position == "Header头":
                     jwt_dic = self.jwt_txt.toPlainText().split(':', 1)
                     tmp_headers = self.headers.copy()
