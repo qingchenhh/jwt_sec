@@ -1,7 +1,6 @@
 import sys,re,jwt,json,base64,requests,os
 from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QLineEdit, QPushButton, QVBoxLayout, QHBoxLayout, QTextEdit, QComboBox, QTableWidget, QHeaderView, QFileDialog, QAbstractItemView, QMessageBox,QTableWidgetItem
 from PyQt5.QtGui import QIcon,QColor
-from PyQt5.QtGui import QKeySequence
 
 class MyWindow(QWidget):
     def __init__(self):
